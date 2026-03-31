@@ -12,6 +12,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- HEADER -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,6 +47,112 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- WHATSAPP TYPE SELECTOR -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#111A16">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📲  WhatsApp Type"
+                    android:textColor="#25D366"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Business Option -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/option_bg_selected"
+                        android:padding="12dp"
+                        android:layout_marginEnd="8dp">
+                        <RadioButton
+                            android:id="@+id/rbBusiness"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:buttonTint="#25D366"/>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Business WA"
+                                android:textColor="#25D366"
+                                android:textSize="13sp"
+                                android:textStyle="bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Recommended"
+                                android:textColor="#3A5248"
+                                android:textSize="10sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Normal Option -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/option_bg"
+                        android:padding="12dp">
+                        <RadioButton
+                            android:id="@+id/rbNormal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:buttonTint="#6B7D73"/>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Normal WA"
+                                android:textColor="#6B7D73"
+                                android:textSize="13sp"
+                                android:textStyle="bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Personal"
+                                android:textColor="#3A5248"
+                                android:textSize="10sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- PHONE NUMBERS -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,9 +186,17 @@
                     android:inputType="textMultiLine"
                     android:background="@drawable/input_bg"
                     android:padding="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💡 Pakistan: 923001234567 (92 + number)"
+                    android:textColor="#3A5248"
+                    android:textSize="11sp"
+                    android:layout_marginTop="6dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- MESSAGE -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -118,6 +233,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- DELAY -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -142,7 +258,7 @@
                     android:id="@+id/etDelay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="3000"
+                    android:hint="5000"
                     android:textColorHint="#2E4038"
                     android:textColor="#E8F5E9"
                     android:textSize="16sp"
@@ -152,13 +268,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Random delay added automatically (min 1000ms)"
+                    android:text="🛡 Random delay auto-add hota hai (min 2000ms)"
                     android:textColor="#3A5248"
                     android:textSize="11sp"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- BUTTONS -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,7 +286,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
-                android:text="START"
+                android:text="▶ START"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:backgroundTint="#25D366"
@@ -179,7 +296,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
-                android:text="PAUSE"
+                android:text="⏸ PAUSE"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:backgroundTint="#FFC107"
@@ -189,12 +306,13 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
-                android:text="RESUME"
+                android:text="↺ RESUME"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:backgroundTint="#128C7E"/>
         </LinearLayout>
 
+        <!-- STATUS -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -210,7 +328,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Status"
+                    android:text="📊 Status"
                     android:textColor="#25D366"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -258,6 +376,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- LOG -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -273,7 +392,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Activity Log"
+                    android:text="📝 Activity Log"
                     android:textColor="#25D366"
                     android:textSize="14sp"
                     android:textStyle="bold"
