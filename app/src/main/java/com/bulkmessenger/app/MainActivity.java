@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,15 +21,16 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private LinearLayout llLog;
     private ScrollView svLog;
+    private RadioButton rbBusiness, rbNormal;
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private List<String> phoneNumbers = new ArrayList<>();
     private String message = "";
-    private int delayMs = 3000;
+    private int delayMs = 5000;
     private int currentIndex = 0;
     private boolean isPaused = false;
     private boolean isRunning = false;
-    private Runnable sendRunnable;
+    private boolean waitingForReturn = false;
     private Random random = new Random();
 
     @Override
@@ -42,18 +42,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        etNumbers = findViewById(R.id.etNumbers);
-        etMessage = findViewById(R.id.etMessage);
-        etDelay = findViewById(R.id.etDelay);
-        btnStart = findViewById(R.id.btnStart);
-        btnPause = findViewById(R.id.btnPause);
-        btnResume = findViewById(R.id.btnResume);
-        tvStatus = findViewById(R.id.tvStatus);
-        tvProgress = findViewById(R.id.tvProgress);
+        etNumbers       = findViewById(R.id.etNumbers);
+        etMessage       = findViewById(R.id.etMessage);
+        etDelay         = findViewById(R.id.etDelay);
+        btnStart        = findViewById(R.id.btnStart);
+        btnPause        = findViewById(R.id.btnPause);
+        btnResume       = findViewById(R.id.btnResume);
+        tvStatus        = findViewById(R.id.tvStatus);
+        tvProgress      = findViewById(R.id.tvProgress);
         tvCurrentNumber = findViewById(R.id.tvCurrentNumber);
-        progressBar = findViewById(R.id.progressBar);
-        llLog = findViewById(R.id.llLog);
-        svLog = findViewById(R.id.svLog);
+        progressBar     = findViewById(R.id.progressBar);
+        llLog           = findViewById(R.id.llLog);
+        svLog           = findViewById(R.id.svLog);
+        rbBusiness      = findViewById(R.id.rbBusiness);
+        rbNormal        = findViewById(R.id.rbNormal);
         btnPause.setEnabled(false);
         btnResume.setEnabled(false);
     }
@@ -64,18 +66,28 @@ public class MainActivity extends AppCompatActivity {
         btnResume.setOnClickListener(v -> resumeSending());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isRunning && !isPaused && waitingForReturn) {
+            waitingForReturn = false;
+            int totalDelay = delayMs + random.nextInt(2000);
+            handler.postDelayed(this::sendCurrent, totalDelay);
+        }
+    }
+
     private void startSending() {
         String numbersRaw = etNumbers.getText().toString().trim();
-        message = etMessage.getText().toString().trim();
-        String delayStr = etDelay.getText().toString().trim();
+        message           = etMessage.getText().toString().trim();
+        String delayStr   = etDelay.getText().toString().trim();
 
         if (TextUtils.isEmpty(numbersRaw)) { showToast("Phone numbers daalo"); return; }
-        if (TextUtils.isEmpty(message)) { showToast("Message daalo"); return; }
+        if (TextUtils.isEmpty(message))    { showToast("Message daalo");        return; }
 
         try {
-            delayMs = TextUtils.isEmpty(delayStr) ? 3000 : Integer.parseInt(delayStr);
-            if (delayMs < 1000) delayMs = 1000;
-        } catch (NumberFormatException e) { delayMs = 3000; }
+            delayMs = TextUtils.isEmpty(delayStr) ? 5000 : Integer.parseInt(delayStr);
+            if (delayMs < 2000) delayMs = 2000;
+        } catch (NumberFormatException e) { delayMs = 5000; }
 
         phoneNumbers.clear();
         llLog.removeAllViews();
@@ -86,9 +98,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (phoneNumbers.isEmpty()) { showToast("Valid numbers nahi mile"); return; }
 
-        currentIndex = 0;
-        isRunning = true;
-        isPaused = false;
+        currentIndex     = 0;
+        isRunning        = true;
+        isPaused         = false;
+        waitingForReturn = false;
+
         progressBar.setMax(phoneNumbers.size());
         progressBar.setProgress(0);
         tvProgress.setText("0 / " + phoneNumbers.size());
@@ -96,68 +110,87 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setEnabled(false);
         btnPause.setEnabled(true);
         btnResume.setEnabled(false);
-        addLog("Loaded " + phoneNumbers.size() + " numbers", "#25D366");
-        scheduleNext();
+
+        addLog("📋 " + phoneNumbers.size() + " numbers load hue", "#25D366");
+        handler.postDelayed(this::sendCurrent, 1000);
     }
 
-    private void scheduleNext() {
+    private void sendCurrent() {
         if (!isRunning || isPaused) return;
-        if (currentIndex >= phoneNumbers.size()) { finishSending(); return; }
-        int totalDelay = (currentIndex == 0) ? 500 : (delayMs + random.nextInt(2000));
-        sendRunnable = () -> {
-            if (!isRunning || isPaused) return;
-            String number = phoneNumbers.get(currentIndex);
-            openWhatsApp(number);
-            currentIndex++;
-            progressBar.setProgress(currentIndex);
-            tvProgress.setText(currentIndex + " / " + phoneNumbers.size());
-            tvCurrentNumber.setText("Sending to: " + number);
-            addLog("Sent to " + number, "#FFFFFF");
-            tvStatus.setText("Sending " + currentIndex + " of " + phoneNumbers.size());
-            scheduleNext();
-        };
-        handler.postDelayed(sendRunnable, totalDelay);
+        if (currentIndex >= phoneNumbers.size()) {
+            finishSending();
+            return;
+        }
+
+        String number = phoneNumbers.get(currentIndex);
+        tvCurrentNumber.setText("📱 " + number);
+        tvStatus.setText("Sending " + (currentIndex + 1) + " / " + phoneNumbers.size());
+        addLog("✅ Sending to: " + number, "#FFFFFF");
+
+        openWhatsApp(number);
+
+        currentIndex++;
+        progressBar.setProgress(currentIndex);
+        tvProgress.setText(currentIndex + " / " + phoneNumbers.size());
+        waitingForReturn = true;
+
+        handler.postDelayed(() -> {
+            if (isRunning && !isPaused && waitingForReturn) {
+                waitingForReturn = false;
+                sendCurrent();
+            }
+        }, delayMs + 8000);
     }
 
     private void openWhatsApp(String number) {
+        String clean = number.replaceAll("\\+", "").replaceAll("\\s", "");
+        String url   = "https://wa.me/" + clean + "?text=" + Uri.encode(message);
+
+        String waPackage = (rbBusiness != null && rbBusiness.isChecked())
+                ? "com.whatsapp.w4b"
+                : "com.whatsapp";
+
         try {
-            String url = "https://wa.me/" + number.replaceAll("\\+", "") + "?text=" + Uri.encode(message);
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            intent.setPackage("com.whatsapp");
+            intent.setPackage(waPackage);
             startActivity(intent);
         } catch (Exception e) {
-            String url = "https://wa.me/" + number.replaceAll("\\+", "") + "?text=" + Uri.encode(message);
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            } catch (Exception ex) {
+                addLog("❌ Error: " + number, "#FF5555");
+            }
         }
     }
 
     private void pauseSending() {
         isPaused = true;
-        if (sendRunnable != null) handler.removeCallbacks(sendRunnable);
-        tvStatus.setText("Paused at " + currentIndex + " / " + phoneNumbers.size());
+        handler.removeCallbacksAndMessages(null);
+        tvStatus.setText("⏸ Paused at " + currentIndex + " / " + phoneNumbers.size());
         btnPause.setEnabled(false);
         btnResume.setEnabled(true);
-        addLog("Paused", "#FFC107");
+        addLog("⏸ Paused", "#FFC107");
     }
 
     private void resumeSending() {
         isPaused = false;
         btnPause.setEnabled(true);
         btnResume.setEnabled(false);
-        tvStatus.setText("Resuming...");
-        addLog("Resumed", "#25D366");
-        scheduleNext();
+        tvStatus.setText("▶ Resuming...");
+        addLog("▶ Resumed", "#25D366");
+        handler.postDelayed(this::sendCurrent, 1000);
     }
 
     private void finishSending() {
         isRunning = false;
-        tvStatus.setText("All messages sent!");
-        tvCurrentNumber.setText("Complete");
+        handler.removeCallbacksAndMessages(null);
+        tvStatus.setText("🎉 Sab messages send ho gaye!");
+        tvCurrentNumber.setText("✅ Complete");
         btnStart.setEnabled(true);
         btnPause.setEnabled(false);
         btnResume.setEnabled(false);
-        addLog("Done! Sent to " + phoneNumbers.size() + " contacts", "#25D366");
-        showToast("All messages sent!");
+        addLog("🎉 Done! " + phoneNumbers.size() + " contacts ko message hua", "#25D366");
+        showToast("🎉 All messages sent!");
     }
 
     private void addLog(String text, String colorHex) {
@@ -177,6 +210,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (sendRunnable != null) handler.removeCallbacks(sendRunnable);
+        handler.removeCallbacksAndMessages(null);
     }
 }
